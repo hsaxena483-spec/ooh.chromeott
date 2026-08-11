@@ -15,7 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  ExternalLink
+  ExternalLink,
+  Maximize2
 } from 'lucide-react';
 import ChartsComponent from '../components/ChartsComponent';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -136,6 +137,7 @@ export default function DashboardPage() {
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [selectedMediaType, setSelectedMediaType] = useState('All');
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
   // Table pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -625,18 +627,52 @@ export default function DashboardPage() {
                 borderRight: '1px solid rgba(255, 255, 255, 0.05)'
               }}>
                 {selectedCampaign.photo_url ? (
-                  <div style={{
-                    width: '100%',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
-                  }}>
+                  <div 
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
+                      cursor: 'zoom-in'
+                    }}
+                    onClick={() => setFullscreenImage(selectedCampaign.photo_url)}
+                  >
                     <img 
                       src={selectedCampaign.photo_url} 
                       alt="Campaign Spot Close View" 
                       style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '400px', objectFit: 'contain' }}
                     />
+                    {/* Floating Full View button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFullscreenImage(selectedCampaign.photo_url);
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        background: 'rgba(15, 17, 26, 0.75)',
+                        backdropFilter: 'blur(4px)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        padding: '6px 10px',
+                        color: '#f8fafc',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s',
+                        outline: 'none',
+                        zIndex: 10
+                      }}
+                    >
+                      <Maximize2 size={12} /> Full View
+                    </button>
                   </div>
                 ) : (
                   <div style={{
@@ -770,6 +806,73 @@ export default function DashboardPage() {
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Image Lightbox Modal */}
+      {fullscreenImage && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(2, 3, 6, 0.95)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 10000,
+          cursor: 'zoom-out'
+        }} onClick={() => setFullscreenImage(null)}>
+          
+          {/* Close button */}
+          <button 
+            onClick={() => setFullscreenImage(null)}
+            style={{
+              position: 'absolute',
+              top: '24px',
+              right: '24px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: '#f8fafc',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              zIndex: 10001,
+              outline: 'none'
+            }}
+          >
+            <X size={20} />
+          </button>
+          
+          {/* Main Fullscreen Image */}
+          <div style={{
+            maxWidth: '95%',
+            maxHeight: '95%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'default'
+          }} onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={fullscreenImage} 
+              alt="Fullscreen Campaign View" 
+              style={{
+                maxWidth: '100%',
+                maxHeight: '90vh',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 30px 60px rgba(0,0,0,0.8)',
+                objectFit: 'contain'
+              }}
+            />
           </div>
         </div>
       )}
