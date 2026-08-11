@@ -21,7 +21,7 @@ export async function GET() {
       const m_type = c.media_type || 'Unknown';
       media_type_counts[m_type] = (media_type_counts[m_type] || 0) + 1;
       
-      const area_name = c.area || 'Unknown';
+      const area_name = c.area === 'Kolkata' ? 'Kolkata City' : (c.area || 'Unknown');
       unique_areas.add(area_name);
       
       let brands_list = c.brands || [];

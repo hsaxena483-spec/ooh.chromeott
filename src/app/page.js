@@ -13,7 +13,9 @@ import {
   SlidersHorizontal,
   Map as MapIcon,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  X,
+  ExternalLink
 } from 'lucide-react';
 import ChartsComponent from '../components/ChartsComponent';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -78,6 +80,48 @@ const BrandPlaceholder = ({ title, description, icon: Icon }) => (
     <p style={{ fontSize: '14px', color: '#94a3b8', maxWidth: '320px', lineHeight: 1.5 }}>{description}</p>
   </div>
 );
+
+const BRAND_COLORS = {
+  'Dalmia Bharat Cement': '#3b82f6',   // Royal Blue
+  'Dalmia Cement': '#3b82f6',          // Royal Blue
+  'JK Cement': '#f97316',              // Orange
+  'JSW Cement': '#a855f7',             // Purple
+  'Ambuja Cement': '#10b981',          // Emerald Green
+  'Adani Ambuja Cement': '#10b981',    // Emerald Green
+  'ACC Cement': '#06b6d4',             // Cyan
+  'Adani ACC Cement': '#06b6d4',       // Cyan
+  'Ultratech Cement': '#f59e0b',       // Amber/Gold
+  'Nuvoco Cement': '#ec4899',          // Pink
+  'Rashmi Cement': '#14b8a6',          // Teal
+  'Ramco': '#6366f1',                  // Indigo
+  'Other': '#64748b',                  // Slate
+};
+
+const getBrandColor = (brandName) => {
+  if (!brandName) return BRAND_COLORS['Other'];
+  const normalized = String(brandName).toLowerCase().trim();
+  
+  if (normalized.includes('dalmia')) return BRAND_COLORS['Dalmia Bharat Cement'];
+  if (normalized.includes('jsw')) return BRAND_COLORS['JSW Cement'];
+  if (normalized.includes('jk')) return BRAND_COLORS['JK Cement'];
+  if (normalized.includes('ambuja')) return BRAND_COLORS['Ambuja Cement'];
+  if (normalized.includes('acc')) return BRAND_COLORS['ACC Cement'];
+  if (normalized.includes('ultratech')) return BRAND_COLORS['Ultratech Cement'];
+  if (normalized.includes('nuvoco')) return BRAND_COLORS['Nuvoco Cement'];
+  if (normalized.includes('rashmi')) return BRAND_COLORS['Rashmi Cement'];
+  if (normalized.includes('ramco')) return BRAND_COLORS['Ramco'];
+  
+  for (const [key, color] of Object.entries(BRAND_COLORS)) {
+    if (key.toLowerCase() === normalized) return color;
+  }
+  
+  let hash = 0;
+  for (let i = 0; i < normalized.length; i++) {
+    hash = normalized.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash % 360);
+  return `hsl(${hue}, 70%, 60%)`;
+};
 
 export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState([]);
@@ -231,9 +275,41 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="dashboard-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '16px' }}>
-          <div className="header-title-section">
-            <h1>Dalmia Brand & OOH Campaign Dashboard</h1>
-            <p>Real-time campaign monitoring, OOH locations mapping, and brand presence analytics for Kolkata</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
+            {/* Premium Dalmia Tricolor SVG Logo */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              background: 'rgba(255, 255, 255, 0.03)', 
+              padding: '10px 18px', 
+              borderRadius: '14px', 
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.05)'
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="38" height="38">
+                <g transform="translate(50, 50)">
+                  {/* Creation, Preservation, Destruction tricolor emblem */}
+                  <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#3b82f6" transform="rotate(0)" />
+                  <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#f97316" transform="rotate(120)" />
+                  <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#10b981" transform="rotate(240)" />
+                  <circle cx="0" cy="0" r="5" fill="#ffffff" />
+                </g>
+              </svg>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '18px', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.8px', lineHeight: 1.1, textTransform: 'uppercase' }}>
+                  Dalmia
+                </span>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#3b82f6', letterSpacing: '2px', textTransform: 'uppercase', lineHeight: 1 }}>
+                  Cement
+                </span>
+              </div>
+            </div>
+            
+            <div className="header-title-section">
+              <h1>Brand & OOH Campaign Dashboard</h1>
+              <p>Real-time campaign monitoring, OOH locations mapping, and brand presence analytics for Kolkata City</p>
+            </div>
           </div>
         </div>
 
@@ -277,9 +353,13 @@ export default function DashboardPage() {
             style={{ padding: '8px 12px' }}
           >
             <option value="All">All Media Types</option>
-            {stats && Object.keys(stats.media_type_counts).sort().map((mtype) => (
-              <option key={mtype} value={mtype}>{mtype}</option>
-            ))}
+            {stats && Object.keys(stats.media_type_counts)
+              .filter(mtype => mtype && mtype.trim() !== '-' && mtype.trim() !== '')
+              .sort()
+              .map((mtype) => (
+                <option key={mtype} value={mtype}>{mtype}</option>
+              ))
+            }
           </select>
           
           {/* Reset Filters button */}
@@ -443,9 +523,9 @@ export default function DashboardPage() {
                             style={{
                               fontSize: '9px',
                               padding: '1px 4px',
-                              background: b.includes('Dalmia') ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)',
-                              borderColor: b.includes('Dalmia') ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)',
-                              color: b.includes('Dalmia') ? '#f87171' : '#60a5fa',
+                              background: `${getBrandColor(b)}24`,
+                              borderColor: `${getBrandColor(b)}4d`,
+                              color: getBrandColor(b),
                               cursor: 'pointer'
                             }}
                           >{b}</span>
@@ -463,8 +543,236 @@ export default function DashboardPage() {
       </section>
 
       {/* Analytics Charts */}
-      {stats && <ChartsComponent stats={stats} />}
+      {stats && <ChartsComponent stats={stats} campaigns={campaigns} />}
 
+      {/* Campaign Details Modal */}
+      {selectedCampaign && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(5, 6, 12, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }} onClick={() => setSelectedCampaign(null)}>
+          <div style={{
+            background: '#0f111a',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '750px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            position: 'relative',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            flexDirection: 'column'
+          }} onClick={(e) => e.stopPropagation()}>
+            
+            {/* Modal Header */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '20px 24px',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+            }}>
+              <div>
+                <span style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  Campaign Spot Details
+                </span>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#f8fafc', margin: '2px 0 0 0' }}>
+                  {selectedCampaign.campaign_id}
+                </h2>
+              </div>
+              <button 
+                onClick={() => setSelectedCampaign(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  color: '#94a3b8',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  outline: 'none'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '0' }}>
+              {/* Left Side: Photo */}
+              <div style={{
+                flex: '1 1 350px',
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(0, 0, 0, 0.2)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.05)'
+              }}>
+                {selectedCampaign.photo_url ? (
+                  <div style={{
+                    width: '100%',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
+                  }}>
+                    <img 
+                      src={selectedCampaign.photo_url} 
+                      alt="Campaign Spot Close View" 
+                      style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '400px', objectFit: 'contain' }}
+                    />
+                  </div>
+                ) : (
+                  <div style={{
+                    width: '100%',
+                    height: '240px',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1px dashed rgba(255, 255, 255, 0.1)',
+                    color: '#64748b'
+                  }}>
+                    <MapPin size={32} style={{ marginBottom: '8px' }} />
+                    <span style={{ fontSize: '13px' }}>No photo available for this spot</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Side: Details Info */}
+              <div style={{
+                flex: '1 1 300px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+              }}>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Brands</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                    {selectedCampaign.brands && selectedCampaign.brands.length > 0 ? (
+                      selectedCampaign.brands.map((b, i) => {
+                        const color = getBrandColor(b);
+                        const isDalmiaBrand = b.toLowerCase().includes('dalmia');
+                        return (
+                          <span 
+                            key={i} 
+                            style={{ 
+                              fontSize: '11px', 
+                              fontWeight: 700, 
+                              color: color, 
+                              background: `rgba(${isDalmiaBrand ? '59, 130, 246' : '100, 116, 139'}, 0.1)`, 
+                              border: `1px solid ${color}`, 
+                              padding: '3px 8px', 
+                              borderRadius: '6px' 
+                            }}
+                          >
+                            {b}
+                          </span>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', background: 'rgba(255, 255, 255, 0.05)', padding: '3px 8px', borderRadius: '6px' }}>
+                        {selectedCampaign.brand || 'No Brand'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>City / Hub</label>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#e2e8f0', margin: '4px 0 0 0' }}>
+                      {selectedCampaign.city || 'Kolkata City'}
+                    </p>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Area / Locality</label>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#e2e8f0', margin: '4px 0 0 0' }}>
+                      {selectedCampaign.area || 'Unknown'}
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Format / Media Type</label>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#e2e8f0', margin: '4px 0 0 0' }}>
+                      {selectedCampaign.media_type || 'Unknown'}
+                    </p>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Road Name</label>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#e2e8f0', margin: '4px 0 0 0' }}>
+                      {selectedCampaign.road_name && selectedCampaign.road_name !== '-' ? selectedCampaign.road_name : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Exact Address / Location</label>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: '#cbd5e1', margin: '4px 0 0 0', lineHeight: 1.5 }}>
+                    {selectedCampaign.location || 'No address location provided'}
+                  </p>
+                </div>
+
+                {selectedCampaign.latitude && selectedCampaign.longitude && (
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Coordinates</label>
+                    <p style={{ fontSize: '12px', fontWeight: 500, color: '#94a3b8', margin: '4px 0 0 0' }}>
+                      {selectedCampaign.latitude}, {selectedCampaign.longitude}
+                    </p>
+                  </div>
+                )}
+
+                {selectedCampaign.map_link && (
+                  <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+                    <a 
+                      href={selectedCampaign.map_link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: '#3b82f6',
+                        color: 'white',
+                        padding: '10px 16px',
+                        borderRadius: '8px',
+                        fontWeight: 600,
+                        fontSize: '13px',
+                        textDecoration: 'none',
+                        transition: 'background 0.2s'
+                      }}
+                    >
+                      <ExternalLink size={14} /> Open in Google Maps
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

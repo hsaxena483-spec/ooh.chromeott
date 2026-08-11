@@ -16,7 +16,7 @@ export async function GET() {
       brand: c.brand,
       brands: c.brands || [],
       location: c.location,
-      area: c.area,
+      area: c.area === 'Kolkata' ? 'Kolkata City' : c.area,
       road_name: c.road_name,
       latitude: c.latitude ? parseFloat(c.latitude) : null,
       longitude: c.longitude ? parseFloat(c.longitude) : null,
