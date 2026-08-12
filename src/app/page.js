@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { 
   MapPin, 
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 import ChartsComponent from '../components/ChartsComponent';
 import SkeletonLoader from '../components/SkeletonLoader';
+import MultiSelect from '../components/MultiSelect';
 
 // Dynamically load MapComponent with SSR disabled since Leaflet relies on the 'window' object
 const MapComponent = dynamic(
@@ -83,8 +85,8 @@ const BrandPlaceholder = ({ title, description, icon: Icon }) => (
 );
 
 const BRAND_COLORS = {
-  'Dalmia Bharat Cement': '#3b82f6',   // Royal Blue
-  'Dalmia Cement': '#3b82f6',          // Royal Blue
+  'Dalmia Bharat Cement': '#1e40af',   // Deep Navy Blue
+  'Dalmia Cement': '#1e40af',          // Deep Navy Blue
   'JK Cement': '#f97316',              // Orange
   'JSW Cement': '#a855f7',             // Purple
   'Ambuja Cement': '#10b981',          // Emerald Green
@@ -125,16 +127,19 @@ const getBrandColor = (brandName) => {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [campaigns, setCampaigns] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [user, setUser] = useState(null);
+  const [imgError, setImgError] = useState(false);
 
   // Filter and Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArea, setSelectedArea] = useState('All');
-  const [selectedBrand, setSelectedBrand] = useState('All');
+  const [selectedBrands, setSelectedBrands] = useState([]); // Empty array means 'All'
   const [selectedMediaType, setSelectedMediaType] = useState('All');
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [fullscreenImage, setFullscreenImage] = useState(null);
@@ -173,8 +178,16 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!localStorage.getItem('token')) {
+      router.push('/login');
+    } else {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+      fetchData();
+    }
+  }, [router]);
 
 
   const handleRefresh = () => {
@@ -191,7 +204,9 @@ export default function DashboardPage() {
       item.road_name.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesArea = selectedArea === 'All' || item.area === selectedArea;
-    const matchesBrand = selectedBrand === 'All' || (item.brands && item.brands.includes(selectedBrand)) || (!item.brands && item.brand === selectedBrand);
+    const matchesBrand = selectedBrands.length === 0 || 
+      (item.brands && item.brands.some(b => selectedBrands.includes(b))) || 
+      (!item.brands && selectedBrands.includes(item.brand));
     const matchesMediaType = selectedMediaType === 'All' || item.media_type === selectedMediaType;
 
     return matchesSearch && matchesArea && matchesBrand && matchesMediaType;
@@ -278,32 +293,32 @@ export default function DashboardPage() {
       <header className="dashboard-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
-            {/* Premium Dalmia Tricolor SVG Logo */}
+            {/* Premium Chrome OOH Logo and Brand Text */}
             <div style={{ 
               display: 'flex', 
               alignItems: 'center', 
-              gap: '12px', 
+              gap: '10px', 
               background: 'rgba(255, 255, 255, 0.03)', 
-              padding: '10px 18px', 
-              borderRadius: '14px', 
+              padding: '8px 14px', 
+              borderRadius: '12px', 
               border: '1px solid rgba(255, 255, 255, 0.06)',
               boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.05)'
             }}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="38" height="38">
-                <g transform="translate(50, 50)">
-                  {/* Creation, Preservation, Destruction tricolor emblem */}
-                  <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#3b82f6" transform="rotate(0)" />
-                  <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#f97316" transform="rotate(120)" />
-                  <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#10b981" transform="rotate(240)" />
-                  <circle cx="0" cy="0" r="5" fill="#ffffff" />
-                </g>
-              </svg>
+              <img 
+                src="/logo.png" 
+                alt="Chrome OOH Logo" 
+                style={{ 
+                  height: '34px', 
+                  width: '34px', 
+                  objectFit: 'contain' 
+                }} 
+              />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '18px', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.8px', lineHeight: 1.1, textTransform: 'uppercase' }}>
-                  Dalmia
+                <span style={{ fontSize: '16px', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.8px', lineHeight: 1.1, textTransform: 'uppercase' }}>
+                  Chromedm
                 </span>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#3b82f6', letterSpacing: '2px', textTransform: 'uppercase', lineHeight: 1 }}>
-                  Cement
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#e21b5a', letterSpacing: '1.5px', textTransform: 'uppercase', lineHeight: 1 }}>
+                  cott
                 </span>
               </div>
             </div>
@@ -313,6 +328,52 @@ export default function DashboardPage() {
               <p>Real-time campaign monitoring, OOH locations mapping, and brand presence analytics for Kolkata City</p>
             </div>
           </div>
+
+          {/* User Profile and Logout */}
+          {user && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                {user.picture && !imgError ? (
+                  <img 
+                    src={user.picture} 
+                    alt="User Profile" 
+                    referrerPolicy="no-referrer"
+                    onError={() => setImgError(true)}
+                    style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} 
+                  />
+                ) : (
+                  <div style={{ 
+                    width: '24px', 
+                    height: '24px', 
+                    borderRadius: '50%', 
+                    backgroundColor: '#e21b5a', 
+                    color: '#ffffff', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: '11px', 
+                    fontWeight: 'bold' 
+                  }}>
+                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+                <span style={{ fontSize: '13px', color: '#cbd5e1', fontWeight: 500 }}>
+                  {user.name}
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('user');
+                  router.push('/login');
+                }}
+                className="pagination-btn"
+                style={{ padding: '8px 14px', fontSize: '13px' }}
+              >
+                Log Out
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Integrated Filter Bar */}
@@ -335,17 +396,13 @@ export default function DashboardPage() {
           </select>
 
           {/* Brand Filter */}
-          <select 
-            className="filter-select"
-            value={selectedBrand}
-            onChange={(e) => { setSelectedBrand(e.target.value); setCurrentPage(1); }}
-            style={{ padding: '8px 12px' }}
-          >
-            <option value="All">All Brands ({stats?.total_brands})</option>
-            {stats?.brands.sort().map((brand) => (
-              <option key={brand} value={brand}>{brand}</option>
-            ))}
-          </select>
+          <div style={{ minWidth: '180px' }}>
+            <MultiSelect 
+              options={stats?.brands || []}
+              selectedValues={selectedBrands}
+              onChange={(vals) => { setSelectedBrands(vals); setCurrentPage(1); }}
+            />
+          </div>
 
           {/* Media Type Filter */}
           <select 
@@ -365,12 +422,12 @@ export default function DashboardPage() {
           </select>
           
           {/* Reset Filters button */}
-          {(selectedArea !== 'All' || selectedBrand !== 'All' || selectedMediaType !== 'All' || searchQuery !== '') && (
+          {(selectedArea !== 'All' || selectedBrands.length > 0 || selectedMediaType !== 'All' || searchQuery !== '') && (
             <button 
               className="pagination-btn"
               onClick={() => {
                 setSelectedArea('All');
-                setSelectedBrand('All');
+                setSelectedBrands([]);
                 setSelectedMediaType('All');
                 setSearchQuery('');
                 setCurrentPage(1);
@@ -438,8 +495,14 @@ export default function DashboardPage() {
               campaigns={filteredCampaigns} 
               selectedCampaign={selectedCampaign}
               onSelectCampaign={handleSelectCampaign}
-              selectedBrand={selectedBrand}
-              onSelectBrand={setSelectedBrand}
+              selectedBrand={selectedBrands.length === 1 ? selectedBrands[0] : 'All'}
+              onSelectBrand={(b) => {
+                if (b === 'All') {
+                  setSelectedBrands([]);
+                } else {
+                  setSelectedBrands([b]);
+                }
+              }}
             />
           </div>
         </div>
@@ -448,7 +511,7 @@ export default function DashboardPage() {
         <div className="section-card">
           <div className="section-card-title">
             <h2><MapPin size={18} /> Active Spot List</h2>
-            {selectedBrand !== 'All' && (
+            {selectedBrands.length > 0 && (
               <span style={{ fontSize: '12px', color: '#94a3b8' }}>Showing {filteredCampaigns.length} Spots</span>
             )}
           </div>
@@ -467,31 +530,16 @@ export default function DashboardPage() {
               />
             </div>
             
-            <select 
-              className="filter-select"
-              value={selectedBrand}
-              onChange={(e) => { setSelectedBrand(e.target.value); setCurrentPage(1); }}
-              style={{ 
-                flex: 1, 
-                padding: '10px 12px', 
-                background: 'rgba(255, 255, 255, 0.04)', 
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '8px',
-                color: '#e2e8f0',
-                fontSize: '13px',
-                outline: 'none',
-                cursor: 'pointer',
-                minWidth: '120px'
-              }}
-            >
-              <option value="All">All Brands</option>
-              {stats?.brands.sort().map((brand) => (
-                <option key={brand} value={brand}>{brand}</option>
-              ))}
-            </select>
+            <div style={{ flex: 1, minWidth: '150px' }}>
+              <MultiSelect 
+                options={stats?.brands || []}
+                selectedValues={selectedBrands}
+                onChange={(vals) => { setSelectedBrands(vals); setCurrentPage(1); }}
+              />
+            </div>
           </div>
 
-          {selectedBrand === 'All' ? (
+          {selectedBrands.length === 0 ? (
             <BrandPlaceholder 
               title="No Brand Selected" 
               description="Select a brand from the dropdown above to view its active campaign spots." 
@@ -513,14 +561,14 @@ export default function DashboardPage() {
                     <div className="sidebar-item-loc">{c.location}</div>
                     <div className="sidebar-item-brands">
                       {c.brands && c.brands
-                        .filter(b => selectedBrand === 'All' || b === selectedBrand)
+                        .filter(b => selectedBrands.length === 0 || selectedBrands.includes(b))
                         .map((b, i) => (
                           <span 
                             key={i} 
                             className="brand-tag" 
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedBrand(b);
+                              setSelectedBrands([b]);
                             }}
                             style={{
                               fontSize: '9px',
@@ -715,7 +763,7 @@ export default function DashboardPage() {
                               fontSize: '11px', 
                               fontWeight: 700, 
                               color: color, 
-                              background: `rgba(${isDalmiaBrand ? '59, 130, 246' : '100, 116, 139'}, 0.1)`, 
+                              background: `rgba(${isDalmiaBrand ? '30, 64, 175' : '100, 116, 139'}, 0.1)`, 
                               border: `1px solid ${color}`, 
                               padding: '3px 8px', 
                               borderRadius: '6px' 

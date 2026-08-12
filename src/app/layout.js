@@ -1,8 +1,8 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Kolkata Brand Monitoring Dashboard',
-  description: 'Interactive dashboard showing campaign locations and brand distribution across Kolkata.',
+  title: 'Chromedm cott - Brand & OOH Campaign Dashboard',
+  description: 'Interactive dashboard for Chromedm cott monitoring campaign locations and brand distribution.',
 };
 
 export default function RootLayout({ children }) {

@@ -851,3 +851,12 @@ body {
   }
 }
 
+
+/* Custom MultiSelect Styling */
+.multiselect-option:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+.hover-bright:hover {
+  color: #f8fafc !important;
+}
+

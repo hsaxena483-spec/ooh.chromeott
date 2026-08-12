@@ -8,8 +8,8 @@ import { Image as ImageIcon } from 'lucide-react';
 
 // Custom colored SVG pin markers: Crimson Red teardrop for Dalmia, Sleek Silver Dot for competitors
 const BRAND_COLORS = {
-  'Dalmia Bharat Cement': '#3b82f6',   // Royal Blue
-  'Dalmia Cement': '#3b82f6',          // Royal Blue
+  'Dalmia Bharat Cement': '#1e40af',   // Deep Navy Blue
+  'Dalmia Cement': '#1e40af',          // Deep Navy Blue
   'JK Cement': '#f97316',              // Orange
   'JSW Cement': '#a855f7',             // Purple
   'Ambuja Cement': '#10b981',          // Emerald Green
@@ -57,7 +57,7 @@ const getBrandLogoSVG = (brandName, size = 16) => {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width={size} height={size} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
         <g transform="translate(50, 50)">
-          <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#3b82f6" transform="rotate(0)" />
+          <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#1e40af" transform="rotate(0)" />
           <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#f97316" transform="rotate(120)" />
           <path d="M 0 0 C 0 -15, -15 -35, 0 -45 C 15 -35, 25 -15, 0 0 Z" fill="#10b981" transform="rotate(240)" />
           <circle cx="0" cy="0" r="5" fill="#ffffff" />

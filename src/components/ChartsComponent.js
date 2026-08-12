@@ -16,8 +16,8 @@ import {
 
 // Color map for brands
 const BRAND_COLORS = {
-  'Dalmia Bharat Cement': '#3b82f6',   // Royal Blue
-  'Dalmia Cement': '#3b82f6',          // Royal Blue
+  'Dalmia Bharat Cement': '#1e40af',   // Deep Navy Blue
+  'Dalmia Cement': '#1e40af',          // Deep Navy Blue
   'JK Cement': '#f97316',              // Orange
   'JSW Cement': '#a855f7',             // Purple
   'Ambuja Cement': '#10b981',          // Emerald Green
@@ -200,16 +200,22 @@ export default function ChartsComponent({ stats, campaigns }) {
   // Group brand counts by media type dynamically for the media formats breakdown
   const mediaTypeBrandCounts = {};
   (campaigns || []).forEach(c => {
-    const mediaType = c.media_type || 'Unknown';
-    if (!mediaTypeBrandCounts[mediaType]) {
-      mediaTypeBrandCounts[mediaType] = {};
-    }
-    const brands = c.brands && c.brands.length > 0 ? c.brands : [c.brand || 'No Brand'];
-    brands.forEach(b => {
-      if (!mediaTypeBrandCounts[mediaType][b]) {
-        mediaTypeBrandCounts[mediaType][b] = 0;
+    const mediaTypeRaw = c.media_type || 'Unknown';
+    const mediaTypes = mediaTypeRaw !== 'Unknown' 
+      ? mediaTypeRaw.split(',').map(m => m.strip ? m.strip() : m.trim()).filter(m => m) 
+      : ['Unknown'];
+    
+    mediaTypes.forEach(mediaType => {
+      if (!mediaTypeBrandCounts[mediaType]) {
+        mediaTypeBrandCounts[mediaType] = {};
       }
-      mediaTypeBrandCounts[mediaType][b]++;
+      const brands = c.brands && c.brands.length > 0 ? c.brands : [c.brand || 'No Brand'];
+      brands.forEach(b => {
+        if (!mediaTypeBrandCounts[mediaType][b]) {
+          mediaTypeBrandCounts[mediaType][b] = 0;
+        }
+        mediaTypeBrandCounts[mediaType][b]++;
+      });
     });
   });
 
@@ -313,8 +319,8 @@ export default function ChartsComponent({ stats, campaigns }) {
                 data={brandShareData}
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={75}
+                innerRadius={65}
+                outerRadius={95}
                 paddingAngle={3}
                 dataKey="value"
                 label={renderCustomizedLabel}

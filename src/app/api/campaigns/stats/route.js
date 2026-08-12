@@ -18,8 +18,14 @@ export async function GET() {
     const unique_brands = new Set();
     
     campaigns.forEach(c => {
-      const m_type = c.media_type || 'Unknown';
-      media_type_counts[m_type] = (media_type_counts[m_type] || 0) + 1;
+      const m_raw = c.media_type || 'Unknown';
+      const m_types = m_raw !== 'Unknown' 
+        ? m_raw.split(',').map(m => m.trim()).filter(m => m) 
+        : ['Unknown'];
+      
+      m_types.forEach(m_type => {
+        media_type_counts[m_type] = (media_type_counts[m_type] || 0) + 1;
+      });
       
       const area_name = c.area === 'Kolkata' ? 'Kolkata City' : (c.area || 'Unknown');
       unique_areas.add(area_name);
