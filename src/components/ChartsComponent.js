@@ -205,7 +205,8 @@ export default function ChartsComponent({ stats, campaigns }) {
       ? mediaTypeRaw.split(',').map(m => m.strip ? m.strip() : m.trim()).filter(m => m) 
       : ['Unknown'];
     
-    mediaTypes.forEach(mediaType => {
+    mediaTypes.forEach(mType => {
+      const mediaType = mType === 'OOH-Damage' ? 'OOH' : mType;
       if (!mediaTypeBrandCounts[mediaType]) {
         mediaTypeBrandCounts[mediaType] = {};
       }

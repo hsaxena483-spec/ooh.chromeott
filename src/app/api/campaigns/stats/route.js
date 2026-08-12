@@ -24,7 +24,8 @@ export async function GET() {
         : ['Unknown'];
       
       m_types.forEach(m_type => {
-        media_type_counts[m_type] = (media_type_counts[m_type] || 0) + 1;
+        const normalizedType = m_type === 'OOH-Damage' ? 'OOH' : m_type;
+        media_type_counts[normalizedType] = (media_type_counts[normalizedType] || 0) + 1;
       });
       
       const area_name = c.area === 'Kolkata' ? 'Kolkata City' : (c.area || 'Unknown');
