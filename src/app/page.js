@@ -136,6 +136,8 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [user, setUser] = useState(null);
   const [imgError, setImgError] = useState(false);
+  const [logoutHover, setLogoutHover] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   // Filter and Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -331,97 +333,167 @@ export default function DashboardPage() {
           </div>
 
           {/* User Profile and Logout */}
-          {user && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '12px',
-              background: 'rgba(30, 41, 59, 0.45)',
-              backdropFilter: 'blur(8px)',
-              padding: '5px 5px 5px 12px', 
-              borderRadius: '20px', 
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-            }}>
-              {/* User Identity */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {user.picture && !imgError ? (
-                  <img 
-                    src={user.picture} 
-                    alt="User Profile" 
-                    referrerPolicy="no-referrer"
-                    onError={() => setImgError(true)}
-                    style={{ 
+          {user && (() => {
+            const displayName = user.name.includes('(') 
+              ? user.name.match(/\(([^)]+)\)/)[1] 
+              : user.name;
+            return (
+              <div style={{ position: 'relative' }}>
+                {/* Profile Trigger Card */}
+                <div 
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    background: 'rgba(15, 23, 42, 0.65)',
+                    backdropFilter: 'blur(12px)',
+                    padding: '5px 14px 5px 6px', 
+                    borderRadius: '24px', 
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+                    e.currentTarget.style.background = 'rgba(15, 23, 42, 0.85)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.background = 'rgba(15, 23, 42, 0.65)';
+                  }}
+                >
+                  {user.picture && !imgError ? (
+                    <img 
+                      src={user.picture} 
+                      alt="User Profile" 
+                      referrerPolicy="no-referrer"
+                      onError={() => setImgError(true)}
+                      style={{ 
+                        width: '26px', 
+                        height: '26px', 
+                        borderRadius: '50%', 
+                        objectFit: 'cover',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        boxShadow: '0 0 6px rgba(255, 255, 255, 0.1)'
+                      }} 
+                    />
+                  ) : (
+                    <div style={{ 
                       width: '26px', 
                       height: '26px', 
                       borderRadius: '50%', 
-                      objectFit: 'cover',
-                      border: '1.5px solid #e21b5a',
-                      boxShadow: '0 0 8px rgba(226, 27, 90, 0.3)'
+                      backgroundColor: '#e21b5a', 
+                      color: '#ffffff', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      fontSize: '11px', 
+                      fontWeight: 'bold',
+                      boxShadow: '0 0 6px rgba(226, 27, 90, 0.3)'
+                    }}>
+                      {displayName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <span style={{ 
+                    fontSize: '13px', 
+                    color: '#f8fafc', 
+                    fontWeight: 600,
+                    letterSpacing: '0.1px'
+                  }}>
+                    {displayName}
+                  </span>
+                  <span style={{ 
+                    fontSize: '9px', 
+                    color: '#94a3b8', 
+                    transition: 'transform 0.2s ease',
+                    transform: profileDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    marginLeft: '2px'
+                  }}>
+                    ▼
+                  </span>
+                </div>
+
+                {/* Click backdrop to close */}
+                {profileDropdownOpen && (
+                  <div 
+                    onClick={() => setProfileDropdownOpen(false)}
+                    style={{ 
+                      position: 'fixed', 
+                      top: 0, 
+                      left: 0, 
+                      right: 0, 
+                      bottom: 0, 
+                      zIndex: 99,
+                      background: 'transparent'
                     }} 
                   />
-                ) : (
+                )}
+
+                {/* Floating Dropdown Card */}
+                {profileDropdownOpen && (
                   <div style={{ 
-                    width: '26px', 
-                    height: '26px', 
-                    borderRadius: '50%', 
-                    backgroundColor: '#e21b5a', 
-                    color: '#ffffff', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    fontSize: '11px', 
-                    fontWeight: 'bold',
-                    boxShadow: '0 0 8px rgba(226, 27, 90, 0.3)'
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    width: '220px',
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    backdropFilter: 'blur(16px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4)',
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    zIndex: 100
                   }}>
-                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '0 4px' }}>
+                      <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Logged in as
+                      </span>
+                      <span style={{ fontSize: '12px', color: '#cbd5e1', wordBreak: 'break-all', fontWeight: 500 }}>
+                        {user.email}
+                      </span>
+                    </div>
+
+                    <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.08)', margin: '2px 0' }} />
+
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        router.push('/login');
+                      }}
+                      onMouseEnter={() => setLogoutHover(true)}
+                      onMouseLeave={() => setLogoutHover(false)}
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: logoutHover ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                        border: 'none',
+                        color: logoutHover ? '#ef4444' : '#94a3b8',
+                        padding: '8px 10px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        width: '100%',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <LogOut size={13} />
+                      <span>Log Out</span>
+                    </button>
                   </div>
                 )}
-                <span style={{ 
-                  fontSize: '13px', 
-                  color: '#f1f5f9', 
-                  fontWeight: 600,
-                  letterSpacing: '0.1px'
-                }}>
-                  {user.name}
-                </span>
               </div>
-              
-              {/* Divider */}
-              <div style={{ 
-                height: '16px', 
-                width: '1px', 
-                backgroundColor: 'rgba(255, 255, 255, 0.12)' 
-              }} />
-
-              {/* Log Out Button */}
-              <button
-                onClick={() => {
-                  localStorage.removeItem('token');
-                  localStorage.removeItem('user');
-                  router.push('/login');
-                }}
-                style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#94a3b8',
-                  padding: '5px 10px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  borderRadius: '16px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-                className="hover-bright-logout"
-              >
-                <LogOut size={13} />
-                <span>Log Out</span>
-              </button>
-            </div>
-          )}
+            );
+          })()}
         </div>
 
         {/* Integrated Filter Bar */}
