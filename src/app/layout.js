@@ -4,7 +4,7 @@ export const metadata = {
   title: 'Chromedm cott - Brand & OOH Campaign Dashboard',
   description: 'Interactive dashboard for Chromedm cott monitoring campaign locations and brand distribution.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.ico?v=2',
   },
 };
 
