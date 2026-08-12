@@ -17,7 +17,8 @@ import {
   ChevronRight,
   X,
   ExternalLink,
-  Maximize2
+  Maximize2,
+  LogOut
 } from 'lucide-react';
 import ChartsComponent from '../components/ChartsComponent';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -331,20 +332,38 @@ export default function DashboardPage() {
 
           {/* User Profile and Logout */}
           {user && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px',
+              background: 'rgba(30, 41, 59, 0.45)',
+              backdropFilter: 'blur(8px)',
+              padding: '5px 5px 5px 12px', 
+              borderRadius: '20px', 
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+            }}>
+              {/* User Identity */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {user.picture && !imgError ? (
                   <img 
                     src={user.picture} 
                     alt="User Profile" 
                     referrerPolicy="no-referrer"
                     onError={() => setImgError(true)}
-                    style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} 
+                    style={{ 
+                      width: '26px', 
+                      height: '26px', 
+                      borderRadius: '50%', 
+                      objectFit: 'cover',
+                      border: '1.5px solid #e21b5a',
+                      boxShadow: '0 0 8px rgba(226, 27, 90, 0.3)'
+                    }} 
                   />
                 ) : (
                   <div style={{ 
-                    width: '24px', 
-                    height: '24px', 
+                    width: '26px', 
+                    height: '26px', 
                     borderRadius: '50%', 
                     backgroundColor: '#e21b5a', 
                     color: '#ffffff', 
@@ -352,25 +371,54 @@ export default function DashboardPage() {
                     alignItems: 'center', 
                     justifyContent: 'center', 
                     fontSize: '11px', 
-                    fontWeight: 'bold' 
+                    fontWeight: 'bold',
+                    boxShadow: '0 0 8px rgba(226, 27, 90, 0.3)'
                   }}>
                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </div>
                 )}
-                <span style={{ fontSize: '13px', color: '#cbd5e1', fontWeight: 500 }}>
+                <span style={{ 
+                  fontSize: '13px', 
+                  color: '#f1f5f9', 
+                  fontWeight: 600,
+                  letterSpacing: '0.1px'
+                }}>
                   {user.name}
                 </span>
               </div>
+              
+              {/* Divider */}
+              <div style={{ 
+                height: '16px', 
+                width: '1px', 
+                backgroundColor: 'rgba(255, 255, 255, 0.12)' 
+              }} />
+
+              {/* Log Out Button */}
               <button
                 onClick={() => {
                   localStorage.removeItem('token');
                   localStorage.removeItem('user');
                   router.push('/login');
                 }}
-                className="pagination-btn"
-                style={{ padding: '8px 14px', fontSize: '13px' }}
+                style={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#94a3b8',
+                  padding: '5px 10px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                className="hover-bright-logout"
               >
-                Log Out
+                <LogOut size={13} />
+                <span>Log Out</span>
               </button>
             </div>
           )}

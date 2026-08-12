@@ -110,7 +110,7 @@ export default function LoginPage() {
           />
           
           <h1 className="wizard-title">Sign into Google</h1>
-          <p className="wizard-subtitle">Sign in to Google to access COTT Analytics</p>
+          <p className="wizard-subtitle">Sign in to Google to access OOH Analytics</p>
 
           {error && (
             <div className="wizard-error-alert">
