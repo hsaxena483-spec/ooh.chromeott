@@ -1,8 +1,5 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/auth/google/route": "app/api/auth/google/route.js",
-  "/api/campaigns/stats/route": "app/api/campaigns/stats/route.js",
-  "/page": "app/page.js",
   "/api/campaigns/route": "app/api/campaigns/route.js",
-  "/login/page": "app/login/page.js"
+  "/api/campaigns/stats/route": "app/api/campaigns/stats/route.js",
+  "/page": "app/page.js"
 }

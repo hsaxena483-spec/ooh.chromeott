@@ -85,6 +85,8 @@ body {
   border: 1px solid var(--panel-border);
   border-radius: var(--card-radius);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 50;
 }
 
 .header-title-section h1 {
