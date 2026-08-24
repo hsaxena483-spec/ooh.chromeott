@@ -181,15 +181,48 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) {
-      router.push('/login');
-    } else {
+    const verifyUserSession = async () => {
+      const token = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+
+      if (!token || !storedUser) {
+        router.push('/login');
+        return;
       }
-      fetchData();
-    }
+
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+
+        // Verify that the user still exists in the database
+        const res = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: parsedUser.email, id: parsedUser.id })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.valid) {
+          // Token is invalid / user no longer exists in DB. Logout and redirect to login page
+          console.warn('Session is invalid or user was deleted from DB. Redirecting to login...');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          router.push('/login');
+        } else {
+          // Valid session, fetch the dashboard data
+          fetchData();
+        }
+      } catch (err) {
+        console.error('Session verification failed, attempting data fetch anyway:', err);
+        // Fallback: if server check fails (e.g. network issue), try to fetch campaign data
+        fetchData();
+      }
+    };
+
+    verifyUserSession();
   }, [router]);
 
 

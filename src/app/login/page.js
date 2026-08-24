@@ -1,32 +1,29 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Script from "next/script";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE !== undefined ? process.env.NEXT_PUBLIC_API_BASE : "";
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "your_client_id";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If already logged in, redirect to home
-    if (localStorage.getItem("token")) {
-      router.push("/");
+    // If already logged in, redirect to dashboard
+    if (localStorage.getItem('token')) {
+      router.push('/');
     }
   }, [router]);
 
   const handleCredentialResponse = async (response) => {
     setLoading(true);
-    setError("");
+    setError('');
     try {
-      const res = await fetch(`${API_BASE}/api/auth/google`, {
-        method: "POST",
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ credential: response.credential })
       });
@@ -34,34 +31,38 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        router.push("/");
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/');
       } else {
-        setError(data.error || "Authentication failed.");
+        setError(data.error || 'Authentication failed.');
       }
     } catch (err) {
-      console.error("Auth login fetch error:", err);
-      setError("Unable to connect to authentication server.");
+      console.error('Auth login fetch error:', err);
+      setError('Unable to connect to the authentication server.');
     } finally {
       setLoading(false);
     }
   };
 
-
-
   const initGoogleAuth = () => {
-    if (typeof window !== "undefined" && window.google) {
-      const btnContainer = document.getElementById("google-signin-btn");
+    if (typeof window !== 'undefined' && window.google) {
+      const btnContainer = document.getElementById('google-signin-btn');
       if (!btnContainer) {
-        // Retry in 50ms if the DOM element is not mounted yet
         setTimeout(initGoogleAuth, 50);
         return;
       }
 
       try {
+        const client_id = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        if (!client_id) {
+          console.error('Google Client ID is missing in environment variables');
+          setError('Google Client ID is not configured.');
+          return;
+        }
+
         window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
+          client_id: client_id,
           callback: handleCredentialResponse,
           auto_select: false,
           cancel_on_tap_outside: true
@@ -70,24 +71,23 @@ export default function LoginPage() {
         window.google.accounts.id.renderButton(
           btnContainer,
           {
-            theme: "filled_blue", // Blue theme matching the first image
-            size: "large",
-            width: "340",         // Custom width matching standard pill buttons
-            shape: "pill",        // Pill shape matching the first image
-            text: "signin_with",
-            logo_alignment: "left"
+            theme: 'filled_blue',
+            size: 'large',
+            width: '320',
+            shape: 'pill',
+            text: 'signin_with',
+            logo_alignment: 'left'
           }
         );
       } catch (err) {
-        console.error("Google Auth init error:", err);
-        setError("Failed to initialize Google Sign-in.");
+        console.error('Google Auth init error:', err);
+        setError('Failed to initialize Google Sign-in.');
       }
     }
   };
 
   useEffect(() => {
-    // Check if script already loaded
-    if (typeof window !== "undefined" && window.google) {
+    if (typeof window !== 'undefined' && window.google) {
       initGoogleAuth();
     }
   }, []);
@@ -99,226 +99,152 @@ export default function LoginPage() {
         onLoad={initGoogleAuth}
         strategy="afterInteractive"
       />
-      
-      <div className="wizard-page-container">
-        <div className="wizard-content">
-          {/* COTT Logo applied at the top */}
-          <img 
-            src="/logo.png" 
-            alt="COTT Logo" 
-            className="wizard-logo-img" 
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#06070d', // Matches --bg-main
+        backgroundImage: `
+          radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0),
+          radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0)
+        `,
+        backgroundSize: '24px 24px',
+        backgroundPosition: '0 0, 12px 12px',
+        fontFamily: "'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        color: '#f8fafc',
+        padding: '24px',
+        boxSizing: 'border-box'
+      }}>
+        {/* Glassmorphism Login Card */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          maxWidth: '440px',
+          width: '100%',
+          padding: '48px 36px',
+          background: 'rgba(17, 18, 36, 0.65)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '24px',
+          boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 50px 0px rgba(59, 130, 246, 0.05)',
+          boxSizing: 'border-box',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Top Decorative Glow */}
+          <div style={{
+            position: 'absolute',
+            top: '-50px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '150px',
+            height: '100px',
+            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+
+          {/* Logo */}
+          <img
+            src="/logo.png"
+            alt="Logo"
+            style={{
+              width: '72px',
+              height: '72px',
+              marginBottom: '24px',
+              filter: 'drop-shadow(0 0 15px rgba(59, 130, 246, 0.3))',
+              objectFit: 'contain'
+            }}
           />
-          
-          <h1 className="wizard-title">Sign into Google</h1>
-          <p className="wizard-subtitle">Sign in to Google to access OOH Analytics</p>
+
+          <h1 style={{
+            fontSize: '28px',
+            fontWeight: 700,
+            color: '#f8fafc',
+            margin: '0 0 8px 0',
+            letterSpacing: '-0.5px',
+            background: 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Welcome Back
+          </h1>
+
+          <p style={{
+            fontSize: '14px',
+            color: '#94a3b8',
+            margin: '0 0 32px 0',
+            lineHeight: 1.5
+          }}>
+            Sign in to access your Brand & OOH Campaign Dashboard
+          </p>
 
           {error && (
-            <div className="wizard-error-alert">
-              <span>{error}</span>
+            <div style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              color: '#f87171',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              fontSize: '13px',
+              fontWeight: 500,
+              marginBottom: '24px',
+              width: '100%',
+              textAlign: 'center',
+              boxSizing: 'border-box'
+            }}>
+              {error}
             </div>
           )}
 
-          <div className="wizard-action-container">
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '44px',
+            width: '100%'
+          }}>
             {loading ? (
-              <div className="wizard-loader">
-                <div className="mini-spinner"></div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: '#94a3b8',
+                fontSize: '14px',
+                fontWeight: 500
+              }}>
+                {/* Custom CSS animation for Spinner */}
+                <div style={{
+                  width: '18px',
+                  height: '18px',
+                  border: '2px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '50%',
+                  borderTopColor: '#3b82f6',
+                  animation: 'spin 1s linear infinite'
+                }} />
                 <span>Authenticating session...</span>
               </div>
             ) : (
-              <div id="google-signin-btn" className="google-btn-wrapper"></div>
+              <div id="google-signin-btn" style={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+                borderRadius: '9999px',
+                overflow: 'hidden'
+              }} />
             )}
           </div>
         </div>
 
+        {/* Global Keyframes for Spinner */}
         <style jsx global>{`
-          .wizard-page-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #1e1e1e; /* Flat dark charcoal background */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #d4d4d4;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9998;
-            padding: 40px;
-            box-sizing: border-box;
-          }
-
-          .wizard-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex-grow: 1;
-            justify-content: center;
-            max-width: 480px;
-            width: 100%;
-            margin-bottom: 80px; /* Leave room for footer */
-          }
-
-          .wizard-logo-img {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.2));
-            animation: logo-fade 0.5s ease forwards;
-          }
-
-          @keyframes logo-fade {
-            from {
-              opacity: 0;
-              transform: scale(0.9);
-            }
-            to {
-              opacity: 1;
-              transform: scale(1);
-            }
-          }
-
-          .wizard-title {
-            font-size: 1.6rem;
-            font-weight: 500;
-            color: #ffffff;
-            margin: 0 0 10px 0;
-            letter-spacing: -0.2px;
-          }
-
-          .wizard-subtitle {
-            font-size: 0.9rem;
-            color: #858585; /* Soft grey subtitle */
-            margin: 0 0 25px 0;
-          }
-
-          .wizard-error-alert {
-            background-color: rgba(241, 76, 76, 0.1);
-            border: 1px solid rgba(241, 76, 76, 0.2);
-            color: #f14c4c;
-            padding: 10px 16px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 320px;
-            box-sizing: border-box;
-          }
-
-          .wizard-action-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 50px;
-            margin-bottom: 30px;
-            width: 100%;
-          }
-
-          .google-btn-wrapper {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-          }
-
-          .google-btn-wrapper iframe {
-            margin: 0 auto !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-radius: 9999px;
-          }
-
-          .wizard-loader {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #858585;
-            font-size: 0.9rem;
-          }
-
-          .mini-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top-color: #d4d4d4;
-            animation: wizard-spin-global 1s linear infinite;
-          }
-
-          .wizard-link-container {
-            margin-top: 15px;
-          }
-
-          .wizard-link {
-            color: #3b82f6; /* Slate blue link color matching VSCode setup */
-            font-size: 0.85rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s ease;
-          }
-
-          .wizard-link:hover {
-            color: #60a5fa;
-            text-decoration: underline;
-          }
-
-          /* Wizard Navigation Footer */
-          .wizard-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 800px;
-            padding: 20px 0;
-            position: absolute;
-            bottom: 40px;
-            box-sizing: border-box;
-          }
-
-          .wizard-nav-btn {
-            background-color: transparent;
-            border: none;
-            color: #5a5a5a;
-            font-size: 0.9rem;
-            cursor: not-allowed;
-            padding: 8px 16px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            font-family: inherit;
-          }
-
-          .wizard-nav-btn.next-btn {
-            background-color: #333333;
-            color: #858585;
-            border: 1px solid #444444;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-          }
-
-          .next-icon {
-            font-size: 0.8rem;
-          }
-
-          .wizard-dots {
-            display: flex;
-            gap: 10px;
-          }
-
-          .wizard-dots .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #3a3a3a;
-          }
-
-          .wizard-dots .dot.active {
-            background-color: #007acc; /* VSCode blue active dot */
-            box-shadow: 0 0 6px #007acc;
-          }
-
-          @keyframes wizard-spin-global {
+          @keyframes spin {
             to { transform: rotate(360deg); }
           }
         `}</style>
